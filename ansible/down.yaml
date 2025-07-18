@@ -1,0 +1,36 @@
+---
+- name: Remove Kubernetes Infrastructure Monitoring and Applications
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - group_vars/all.yaml
+  
+  tasks:
+    - name: Remove rolldice application
+      kubernetes.core.helm:
+        name: "{{ rolldice_release_name }}"
+        release_namespace: "{{ k8s_namespace }}"
+        state: absent
+        wait: true
+        wait_timeout: 300
+      ignore_errors: yes
+
+    - name: Remove k8s-infra helm chart
+      kubernetes.core.helm:
+        name: "{{ k8sinfra_release_name }}"
+        release_namespace: "{{ k8s_namespace }}"
+        state: absent
+        wait: true
+        wait_timeout: 600
+      ignore_errors: yes
+
+    - name: Remove namespace (optional)
+      kubernetes.core.k8s:
+        name: "{{ k8s_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: absent
+        wait: true
+        wait_timeout: 300
+      when: remove_namespace | default(false)

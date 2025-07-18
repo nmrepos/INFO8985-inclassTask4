@@ -1,0 +1,14 @@
+---
+# Default values for k8sinfra role
+k8s_namespace: "monitoring"
+k8sinfra_release_name: "k8s-infra-monitoring"
+k8sinfra_chart_version: ""
+
+# Default SigNoz configuration
+signoz_otel_endpoint: "localhost:4317"
+signoz_otel_insecure: true
+signoz_api_key: ""
+
+# Default cluster information
+cluster_name: "default-cluster"
+deployment_environment: "development"

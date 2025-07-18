@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Your Name
+  description: Ansible role to deploy SigNoz k8s-infra helm chart for Kubernetes monitoring
+  company: 
+  license: MIT
+  min_ansible_version: 2.10
+  platforms:
+  - name: GenericLinux
+    versions:
+    - all
+  galaxy_tags:
+  - kubernetes
+  - monitoring
+  - signoz
+  - opentelemetry
+  - helm
+
+dependencies:
+  - name: kubernetes.core
+    version: ">=2.3.0"

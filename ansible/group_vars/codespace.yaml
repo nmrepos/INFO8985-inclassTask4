@@ -1,0 +1,79 @@
+---
+# Demo configuration optimized for GitHub Codespace
+# This uses minimal resources and local endpoints
+
+# Kubernetes Configuration
+k8s_namespace: "monitoring"
+cluster_name: "codespace-demo-cluster"
+deployment_environment: "demo"
+
+# SigNoz Configuration for Codespace Demo
+# Update these values based on your setup:
+# Option 1: SigNoz running in TrueNAS (external)
+# signoz_otel_endpoint: "192.168.1.100:4317"  # Replace with your TrueNAS IP
+# Option 2: SigNoz running locally in codespace
+signoz_otel_endpoint: "localhost:4317"  # For local SigNoz instance
+# Option 3: SigNoz Cloud
+# signoz_otel_endpoint: "ingest.us.signoz.cloud:443"  # Replace with your region
+
+signoz_otel_insecure: true  # Set to false for SigNoz Cloud
+signoz_api_key: ""  # Add your API key for SigNoz Cloud
+
+# Helm Release Names
+k8sinfra_release_name: "demo-k8s-infra"
+rolldice_release_name: "demo-rolldice"
+
+# K8s-Infra Chart Configuration (optimized for demo)
+k8sinfra_chart_version: ""
+k8sinfra_values:
+  global:
+    cloud: "others"
+    clusterName: "{{ cluster_name }}"
+    deploymentEnvironment: "{{ deployment_environment }}"
+  
+  # OTEL Collector Endpoint - key override for upstream collector
+  otelCollectorEndpoint: "{{ signoz_otel_endpoint }}"
+  otelInsecure: "{{ signoz_otel_insecure }}"
+  signozApiKey: "{{ signoz_api_key }}"
+  
+  # Resource limits for codespace (smaller resources)
+  otelAgent:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  
+  otelDeployment:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  
+  # Presets configuration
+  presets:
+    otlpExporter:
+      enabled: true
+    loggingExporter:
+      enabled: false
+    logsCollection:
+      enabled: true
+    hostMetrics:
+      enabled: true
+    kubeletMetrics:
+      enabled: true
+    clusterMetrics:
+      enabled: true
+
+# Rolldice Application Configuration (minimal for demo)
+rolldice_image: "signoz/sample-app:latest"
+rolldice_replicas: 1  # Reduced for codespace
+rolldice_port: 8080
+
+# Codespace-specific settings
+remove_namespace: false
