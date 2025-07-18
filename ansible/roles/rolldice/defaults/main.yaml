@@ -1,8 +1,0 @@
----
-# Default values for rolldice role
-k8s_namespace: "monitoring"
-rolldice_release_name: "rolldice-app"
-rolldice_image: "signoz/sample-app:latest"
-rolldice_replicas: 2
-rolldice_port: 8080
-deployment_environment: "development"
