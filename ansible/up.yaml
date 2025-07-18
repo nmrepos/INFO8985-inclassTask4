@@ -1,0 +1,29 @@
+- name: Install k8sinfra and rolldice
+  hosts: localhost
+  gather_facts: false
+  vars:
+    otel_collector_endpoint: "http://signoz-collector.truenas:4317"
+  tasks:
+    - name: Render values file
+      template:
+        src: ../values/k8sinfra-values.yaml.j2
+        dest: /tmp/k8sinfra-values.yaml
+
+    - name: Add Signoz helm repo
+      community.kubernetes.helm_repository:
+        name: signoz
+        repo_url: https://charts.signoz.io
+
+    - name: Install k8sinfra helm chart
+      community.kubernetes.helm:
+        name: k8sinfra
+        chart_ref: signoz/k8s-infra
+        release_namespace: k8sinfra
+        create_namespace: true
+        values_files:
+          - /tmp/k8sinfra-values.yaml
+
+    - name: Deploy rolldice app
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', '../k8s/rolldice.yaml') }}"

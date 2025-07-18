@@ -1,0 +1,21 @@
+- name: Remove k8sinfra and rolldice
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Remove rolldice deployment
+      kubernetes.core.k8s:
+        state: absent
+        definition: "{{ lookup('file', '../k8s/rolldice.yaml') }}"
+
+    - name: Uninstall k8sinfra helm chart
+      community.kubernetes.helm:
+        name: k8sinfra
+        release_namespace: k8sinfra
+        state: absent
+
+    - name: Remove k8sinfra namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: k8sinfra
+        state: absent
