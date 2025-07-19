@@ -2,6 +2,7 @@
   hosts: localhost
   gather_facts: false
   vars:
+    ansible_python_interpreter: /home/codespace/.python/current/bin/python3
     otel_collector_endpoint: "http://signoz-collector.truenas:4317"
   tasks:
     - name: Render values file
