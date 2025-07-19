@@ -1,0 +1,10 @@
+# release & chart settings
+namespace: signoz-system
+release_name: k8s-infra
+chart_repo_name: signoz
+chart_repo_url: https://charts.signoz.io
+chart_name: signoz/k8s-infra-metrics
+chart_version: "0.3.0"
+
+# point the chart at your local Docker‑hosted Signoz
+signoz_backend_url: http://localhost:3301

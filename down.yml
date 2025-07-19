@@ -1,0 +1,18 @@
+---
+- name: Uninstall Signoz K8S‑Infra metrics chart
+  hosts: k8s
+  gather_facts: false
+
+  tasks:
+    - name: Uninstall Helm release
+      community.kubernetes.helm:
+        name: "{{ release_name }}"
+        release_namespace: "{{ namespace }}"
+        state: absent
+
+    - name: Remove namespace
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ namespace }}"
+        state: absent

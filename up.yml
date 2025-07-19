@@ -1,0 +1,78 @@
+---
+- name: Install SigNoz K8S‑Infra metrics chart
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    namespace: signoz-system
+    release_name: k8s-infra
+    chart_repo_name: signoz
+    chart_repo_url: https://charts.signoz.io
+    chart_name: signoz/k8s-infra
+    chart_version: "0.13.0"
+
+  
+    otel_collector_endpoint: "{{ lookup('env','DOCKER_HOST_IP') }}:4317"
+
+    # Optional metadata
+    k8s_cluster_name: codespace-demo
+    deployment_environment: development
+
+  tasks:
+    - name: Ensure namespace exists
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ namespace }}"
+        state: present
+
+    - name: Add SigNoz Helm repo (and force update)
+      community.kubernetes.helm_repository:
+        name: "{{ chart_repo_name }}"
+        repo_url: "{{ chart_repo_url }}"
+        state: present
+        force_update: yes
+
+    - name: Install or upgrade k8s‑infra chart
+      community.kubernetes.helm:
+        name: "{{ release_name }}"
+        chart_ref: "{{ chart_name }}"
+        release_namespace: "{{ namespace }}"
+        chart_version: "{{ chart_version }}"
+        create_namespace: false
+        values:
+          global:
+            clusterName: "{{ k8s_cluster_name }}"
+            deploymentEnvironment: "{{ deployment_environment }}"
+
+          # point the collector at your Docker‑host OTLP port
+          otelCollectorEndpoint: "{{ otel_collector_endpoint }}"
+          otelInsecure: true
+
+          # enable the metrics you want (logs optional)
+          presets:
+            otlpExporter:
+              enabled: true
+            loggingExporter:
+              enabled: false
+            hostMetrics:
+              enabled: true
+            kubeletMetrics:
+              enabled: true
+            clusterMetrics:
+              enabled: true
+
+          # disable hostPorts so scheduling works
+          otelAgent:
+            ports:
+              otlp:
+                hostPort: null
+              otlp-http:
+                hostPort: null
+              metrics:
+                hostPort: null
+              health-check:
+                hostPort: null
+
+        state: present
